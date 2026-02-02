@@ -21,10 +21,7 @@ export const AuthProvider = ({ children }) => {
       { id: 2, name: 'Dr. Michael Chen', email: 'michael@pharmacy.com', phone: '555-0102', license: 'PH-12346' },
     ];
   });
-  const [orders, setOrders] = useState(() => {
-    const saved = localStorage.getItem('orders');
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [orders, setOrders] = useState([]);
 
   // Initialize user and fetch medicines
   useEffect(() => {
@@ -44,11 +41,6 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('pharmacists', JSON.stringify(pharmacists));
   }, [pharmacists]);
-
-  // Save orders to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('orders', JSON.stringify(orders));
-  }, [orders]);
 
   const login = async (email, password, role) => {
     const normalizedEmail = email?.trim().toLowerCase();

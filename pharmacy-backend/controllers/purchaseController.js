@@ -162,106 +162,37 @@ export const updatePurchaseStatus = async (req, res) => {
         failed: 'Unfortunately, your order could not be processed. Please contact us.'
       };
       
-      const emailData = {
-        sender: {
-          name: "Intare Pharmacy",
-          email: process.env.FROM_EMAIL
-        },
-        to: [{
-          email: purchase.customerEmail,
-          name: purchase.customerName
-        }],
-        subject: `Order ${status.charAt(0).toUpperCase() + status.slice(1)} - Intare Pharmacy`,
-        htmlContent: `
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Order Update</title>
-          </head>
-          <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f8fafc;">
-            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-              <!-- Header -->
-              <div style="background: linear-gradient(135deg, ${status === 'confirmed' ? '#10b981, #059669' : status === 'delivered' ? '#3b82f6, #1d4ed8' : '#ef4444, #dc2626'}); padding: 40px 30px; text-align: center;">
-                <h1 style="color: #ffffff; margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.5px;">🏥 Intare Pharmacy</h1>
-                <p style="color: #e2e8f0; margin: 8px 0 0 0; font-size: 16px;">Order Status Update</p>
-              </div>
-              
-              <!-- Content -->
-              <div style="padding: 40px 30px;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                  <div style="display: inline-block; background-color: ${status === 'confirmed' ? '#10b981' : status === 'delivered' ? '#3b82f6' : '#ef4444'}; color: white; padding: 12px 24px; border-radius: 50px; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">
-                    ${status === 'confirmed' ? '✓ Confirmed' : status === 'delivered' ? '📦 Delivered' : '⚠️ Failed'}
-                  </div>
-                </div>
-                
-                <h2 style="color: #1f2937; margin: 0 0 16px 0; font-size: 24px; font-weight: 600;">Hello ${purchase.customerName}!</h2>
-                <p style="color: #6b7280; margin: 0 0 30px 0; font-size: 16px; line-height: 1.6;">${statusMessages[status]}</p>
-                
-                <!-- Order Details Card -->
-                <div style="background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; margin: 30px 0;">
-                  <h3 style="color: #374151; margin: 0 0 20px 0; font-size: 18px; font-weight: 600;">📋 Order Summary</h3>
-                  <div style="border-bottom: 1px solid #e5e7eb; padding-bottom: 12px; margin-bottom: 12px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                      <span style="color: #6b7280; font-size: 14px;">Order ID</span>
-                      <span style="color: #1f2937; font-weight: 600; font-family: monospace;">#${purchase._id.toString().slice(-8).toUpperCase()}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                      <span style="color: #6b7280; font-size: 14px;">Medicine</span>
-                      <span style="color: #1f2937; font-weight: 600;">${purchase.medicineName}</span>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                      <span style="color: #6b7280; font-size: 14px;">Status</span>
-                      <span style="color: ${status === 'confirmed' ? '#10b981' : status === 'delivered' ? '#3b82f6' : '#ef4444'}; font-weight: 700; text-transform: uppercase;">${status}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                ${status === 'delivered' ? `
-                <div style="background: linear-gradient(135deg, #d1fae5, #a7f3d0); border-radius: 12px; padding: 20px; margin: 30px 0; text-align: center;">
-                  <h4 style="color: #065f46; margin: 0 0 12px 0; font-size: 18px; font-weight: 600;">🎉 Thank You!</h4>
-                  <p style="color: #047857; margin: 0; font-size: 14px;">We hope our service met your expectations. Feel free to reach out if you need anything else!</p>
-                </div>
-                ` : status === 'failed' ? `
-                <div style="background: linear-gradient(135deg, #fee2e2, #fecaca); border-radius: 12px; padding: 20px; margin: 30px 0;">
-                  <h4 style="color: #991b1b; margin: 0 0 12px 0; font-size: 16px; font-weight: 600;">📞 Need Assistance?</h4>
-                  <p style="color: #b91c1c; margin: 0; font-size: 14px;">Please contact our support team to resolve this issue or place a new order.</p>
-                </div>
-                ` : ''}
-              </div>
-              
-              <!-- Footer -->
-              <div style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
-                <p style="color: #6b7280; margin: 0 0 16px 0; font-size: 14px;">Questions? We're here to help!</p>
-                <div style="margin-bottom: 20px;">
-                  <a href="tel:+1234567890" style="color: #667eea; text-decoration: none; margin: 0 15px; font-weight: 500;">📞 Call Us</a>
-                  <a href="mailto:support@intarepharmacy.com" style="color: #667eea; text-decoration: none; margin: 0 15px; font-weight: 500;">✉️ Email</a>
-                </div>
-                <p style="color: #9ca3af; margin: 0; font-size: 12px;">© 2024 Intare Pharmacy. All rights reserved.</p>
-              </div>
+      const { sendEmail } = await import('../utils/emailService.js');
+      
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="utf-8">
+          <title>Order Update</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #667eea, #764ba2); padding: 40px 30px; text-align: center;">
+            <h1 style="color: #ffffff; margin: 0; font-size: 28px;">🏥 Intare Pharmacy</h1>
+          </div>
+          <div style="padding: 40px 30px;">
+            <h2 style="color: #1f2937;">Hello ${purchase.customerName}!</h2>
+            <p style="color: #6b7280; font-size: 16px;">${statusMessages[status]}</p>
+            <div style="background-color: #f9fafb; border-radius: 12px; padding: 24px; margin: 30px 0;">
+              <h3 style="color: #374151;">📋 Order Summary</h3>
+              <p><strong>Medicine:</strong> ${purchase.medicineName}</p>
+              <p><strong>Status:</strong> ${status.toUpperCase()}</p>
             </div>
-          </body>
-          </html>
-        `
-      };
+          </div>
+        </body>
+        </html>
+      `;
       
-      const response = await fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-          'api-key': process.env.BREVO_API_KEY
-        },
-        body: JSON.stringify(emailData)
-      });
-      
-      if (response.ok) {
-        console.log('✅ Status update email sent to:', purchase.customerEmail);
-      } else {
-        const errorData = await response.json();
-        console.log('❌ Email failed:', errorData);
-      }
+      await sendEmail(
+        purchase.customerEmail,
+        `Order ${status.charAt(0).toUpperCase() + status.slice(1)} - Intare Pharmacy`,
+        htmlContent
+      );
     } catch (emailError) {
       console.log('❌ Email sending failed:', emailError.message);
     }

@@ -1,59 +1,38 @@
-import nodemailer from 'nodemailer';
-
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER || 'jabogabiro1@gmail.com',
-    pass: process.env.EMAIL_PASS || 'your-app-password'
-  }
-});
-
-export const sendOrderStatusEmail = async (customerEmail, customerName, medicineName, status, orderId) => {
-  // Email functionality disabled - would need proper credentials
-  console.log(`📧 Email notification (disabled): ${status} order for ${medicineName} to ${customerEmail}`);
-  return;
-  
-  const statusMessages = {
-    confirmed: {
-      subject: 'Order Confirmed - Intare Pharmacy',
-      message: `Your order for ${medicineName} has been confirmed and will be delivered soon.`
-    },
-    delivered: {
-      subject: 'Order Delivered - Intare Pharmacy', 
-      message: `Your order for ${medicineName} has been successfully delivered. Thank you for choosing Intare Pharmacy!`
-    },
-    failed: {
-      subject: 'Order Update - Intare Pharmacy',
-      message: `Unfortunately, your order for ${medicineName} could not be processed. Please contact us for assistance.`
-    }
-  };
-
-  const emailContent = statusMessages[status];
-  
-  const mailOptions = {
-    from: process.env.EMAIL_USER || 'intarepharmacy@gmail.com',
-    to: customerEmail,
-    subject: emailContent.subject,
-    html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #228B22;">Intare Pharmacy</h2>
-        <p>Dear ${customerName},</p>
-        <p>${emailContent.message}</p>
-        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
-          <strong>Order Details:</strong><br>
-          Order ID: #${orderId}<br>
-          Medicine: ${medicineName}<br>
-          Status: ${status.charAt(0).toUpperCase() + status.slice(1)}
-        </div>
-        <p>Best regards,<br>Intare Pharmacy Team</p>
-      </div>
-    `
-  };
-
+export const sendEmail = async (to, subject, htmlContent) => {
   try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Email sent to ${customerEmail} for order ${orderId}`);
+    const emailData = {
+      sender: {
+        name: "Intare Pharmacy",
+        email: process.env.FROM_EMAIL
+      },
+      to: [{
+        email: to,
+        name: to.split('@')[0]
+      }],
+      subject: subject,
+      htmlContent: htmlContent
+    };
+    
+    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'api-key': process.env.BREVO_API_KEY
+      },
+      body: JSON.stringify(emailData)
+    });
+    
+    if (response.ok) {
+      console.log('✅ Email sent successfully to:', to);
+      return true;
+    } else {
+      const errorData = await response.json();
+      console.log('❌ Email failed:', errorData);
+      return false;
+    }
   } catch (error) {
-    console.error('Email sending failed:', error);
+    console.log('❌ Email error:', error.message);
+    return false;
   }
 };

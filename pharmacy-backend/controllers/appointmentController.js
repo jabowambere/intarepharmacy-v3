@@ -164,8 +164,9 @@ export const updateAppointmentStatus = async (req, res) => {
       return res.status(404).json({ message: 'Appointment not found' });
     }
     
-    // Send email notification
-    try {
+    // Email functionality disabled - account needs activation
+    console.log(`📧 Appointment email: ${status} appointment for ${appointment.patientName}`);
+    /*
       const emailData = {
         sender: {
           name: "Intare Pharmacy",
@@ -285,9 +286,7 @@ export const updateAppointmentStatus = async (req, res) => {
         const errorData = await response.json();
         console.log('❌ Appointment email failed:', errorData);
       }
-    } catch (emailError) {
-      console.log('❌ Appointment email sending failed:', emailError.message);
-    }
+    */
     
     res.json({ message: 'Appointment status updated successfully', appointment });
   } catch (error) {
