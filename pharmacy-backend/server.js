@@ -18,7 +18,8 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "https://intarepharmacy.vercel.app", // your frontend domain
+    "https://intarepharmacy.vercel.app",
+    "https://intarepharmacy01.netlify.app", // Add your Netlify URL here
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
