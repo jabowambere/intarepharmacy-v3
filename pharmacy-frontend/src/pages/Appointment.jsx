@@ -46,7 +46,8 @@ const Appointment = () => {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/appointments', {
+      const apiUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+      const response = await fetch(`${apiUrl}/api/appointments`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

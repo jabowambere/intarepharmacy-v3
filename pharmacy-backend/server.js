@@ -20,6 +20,7 @@ app.use(cors({
     "http://localhost:3000",
     "https://intarepharmacy.vercel.app",
     "https://intarepharmacy01.netlify.app", // Add your Netlify URL here
+    "https://intarepharmacy-v3.netlify.app", // Add v3 Netlify URL
   ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true

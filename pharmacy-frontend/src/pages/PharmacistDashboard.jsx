@@ -59,7 +59,7 @@ const PharmacistDashboard = () => {
   const fetchAppointments = async () => {
     try {
       console.log('📅 Fetching appointments...');
-      const apiUrl = 'http://localhost:5000';
+      const apiUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
       const token = localStorage.getItem('token');
       console.log('🔑 Token:', token ? 'Present' : 'Missing');
       console.log('🌐 API URL:', `${apiUrl}/api/appointments`);
