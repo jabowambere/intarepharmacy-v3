@@ -19,9 +19,8 @@ app.use(cors({
   origin: [
     "http://localhost:3000",
     "https://intarepharmacy.vercel.app",
-    "https://intarepharmacy01.netlify.app", // Add your Netlify URL here
-    "https://intarepharmacy-v3.netlify.app", // Add v3 Netlify URL
-  ],
+    "https://intarepharmacy02.netlify.app", // Add your Netlify URL here
+    "https://intarepharmacy02.netlify.app", // Add v3 Netlify URL    "https://intarepharmacy02.netlify.app", // Add your current Netlify site  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
