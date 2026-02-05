@@ -19,8 +19,8 @@ app.use(cors({
   origin: [
     "http://localhost:3000",
     "https://intarepharmacy.vercel.app",
-    "https://intarepharmacy02.netlify.app", // Add your Netlify URL here
-    "https://intarepharmacy02.netlify.app", // Add v3 Netlify URL    "https://intarepharmacy02.netlify.app", // Add your current Netlify site  ],
+    "https://intarepharmacy02.netlify.app"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
@@ -43,10 +43,15 @@ app.get("/", (req, res) => {
 });
 
 /* ===== DATABASE ===== */
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch(err => console.error("MongoDB connection error:", err));
+const MONGO_URI = process.env.MONGO_URI;
+if (MONGO_URI) {
+  mongoose
+    .connect(MONGO_URI)
+    .then(() => console.log("MongoDB connected"))
+    .catch(err => console.error("MongoDB connection error:", err));
+} else {
+  console.warn("MONGO_URI is not set. Skipping MongoDB connection. Set MONGO_URI in your environment to enable DB.");
+}
 
 /* ===== SERVER ===== */
 const PORT = process.env.PORT || 5000;
